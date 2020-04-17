@@ -472,9 +472,9 @@ export default {
   created () {
     this.playlist = this.$store.state.playlist
     this.id = this.$route.params.id
-    const audio1 = document.getElementById('audio')
-    // 开始播放
-    audio1.play();
+    // const audio1 = document.getElementById('audio')
+    // // 开始播放
+    // audio1.play();
   },
   mounted () {
     // console.log(this.$store.state.playlist);
