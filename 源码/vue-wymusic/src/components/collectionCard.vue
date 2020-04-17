@@ -7,8 +7,16 @@
         <span>{{name}}</span>
       </div>
       <div class="collheader_right">
-        <van-icon name="https://s1.ax1x.com/2020/03/28/GFyZG9.png"
-                  size="20" />
+        <transition name="fade">
+          <van-icon name="https://s1.ax1x.com/2020/03/28/GFyZG9.png"
+                    size="20"
+                    ref="searchIcon"
+                    @click="searchByName()" />
+        </transition>
+        <input type="text"
+               v-model="searchValue"
+               v-show="searchLoad"
+               @change="filterSong">
         <van-icon name="https://s1.ax1x.com/2020/03/28/GFsgHO.png"
                   size="30" />
       </div>
@@ -73,7 +81,7 @@
         <div :key="index"
              @click="handleSong(item,index,item.id)"
              class="songlist_item"
-             v-for="(item, index) in colldata.tracks">
+             v-for="(item, index) in filterSong()">
 
           <div class="song_itemindex">
             {{index+1}}
@@ -118,7 +126,9 @@ export default {
   },
   data () {
     return {
-      songurl: ''
+      songurl: '',
+      searchLoad: false,
+      searchValue: ''
     }
   },
   methods: {
@@ -134,6 +144,15 @@ export default {
       const res = await this.$http.get(`song/url?id=${id}`)
       this.songurl = res.data.data[0].url
       this.$store.commit('addurl', this.songurl)
+    },
+    // 点击显示搜索框
+    searchByName () {
+      this.$refs.searchIcon.style.display = 'none'
+      this.searchLoad = true
+    },
+    // 检索
+    filterSong () {
+      return this.colldata.tracks.filter(item => item.name.includes(this.searchValue))
     }
   },
 }
@@ -164,9 +183,18 @@ export default {
 }
 .collheader_right {
   justify-content: space-between;
-  width: 80px;
+  width: auto;
   display: flex;
   align-items: center;
+}
+.collheader_right input[type="text"] {
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  padding: 5px 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  color: #fff;
 }
 .collbcg {
   top: 0px;
@@ -356,5 +384,13 @@ export default {
 }
 .songlist_sq {
   display: inline-block;
+}
+/* 离开动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
