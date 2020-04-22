@@ -28,8 +28,10 @@ Vue.use(Vant);
 // Vue.use(dayjs);
 Vue.use(Lazyload);
 axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = "https://musicapi.citrons.cn";
-axios.defaults.baseURL = "http://localhost:3000";
+axios.defaults.baseURL = "https://musicapi.citrons.cn";
+// axios.defaults.baseURL = "http://localhost:3000";
+// axios.defaults.baseURL = "/api";
+
 Vue.prototype.$http = axios;
 Vue.prototype.$lodash = lodash;
 Vue.use(axios);

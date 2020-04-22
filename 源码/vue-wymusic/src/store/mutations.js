@@ -94,6 +94,32 @@ const mutations = {
     deleteAllSong(state) {
         state.singer = [];
         state.fullScreen = false;
+    },
+    // 添加全部歌曲
+    pushAllSong(state, item) {
+        state.singer = [];
+        state.playlist = [];
+        item.forEach(v => {
+            state.singer.push(v.al);
+        });
+        console.log(state.singer);
+
+        state.playlist = state.singer[0];
+    },
+    // 私信消息数量
+    saveMsg(state, data) {
+        state.newCountMsg = data.count;
+        state.Msg = data.msg;
+    },
+    // 退出登录
+    loyout(state) {
+        state.newCountMsg = "";
+        state.singer = [];
+        state.playlist = [];
+    },
+    // 签到
+    singin(state) {
+        state.sing_in = true;
     }
 };
 export default mutations;

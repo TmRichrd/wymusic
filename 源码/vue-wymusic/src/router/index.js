@@ -19,10 +19,12 @@ import Recoday from "../views/recoday.vue";
 import SingerList from "../views/singerlist.vue";
 import Singerinfo from "../views/singerinfo.vue";
 import Ranklist from "../views/ranklist.vue";
+import LoginTip from "../views/loginTip.vue";
+
 Vue.use(Router);
 
 export default new Router({
-    mode: "history",
+    // mode: "history",
     routes: [{
             path: "/",
             name: "main",
@@ -108,9 +110,9 @@ export default new Router({
             component: Recoday,
             beforeEnter: (to, from, next) => {
                 const userInfo = window.localStorage.getItem("userInfo");
-                if (to.path == "/login") next();
+                if (to.path == "/loginTip") next();
                 if (!userInfo) {
-                    return next("/login");
+                    return next("/loginTip");
                 }
                 next();
             }
@@ -129,6 +131,11 @@ export default new Router({
             path: "/ranklist",
             name: "ranklist",
             component: Ranklist
+        },
+        {
+            path: "/loginTip",
+            name: "loginTip",
+            component: LoginTip
         }
     ]
 });

@@ -77,7 +77,7 @@ export default {
       this.recoSong = res.data.recommend
       this.hasLoad = false
       // console.log(res);
-      // console.log(this.recoSong);
+      console.log(this.recoSong[0]);
     },
     handleSong (item, index, songid, singer, songname) {
       // console.log(item.album);

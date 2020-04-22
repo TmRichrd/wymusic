@@ -13,7 +13,6 @@
               <p>{{playlist.songname}}</p>
               <!-- <p>{{playlist.ar.map(v=>v.name).join('/')}}</p> -->
               <p>{{playlist.singer}}</p>
-
               <!-- <p>{{playlist.artists.map(v=>v.name).join('/')}}&gt;</p> -->
             </div>
           </div>
@@ -66,7 +65,7 @@
           <div class="lyric_wrap">
             <div class="bscroll"
                  ref="bscroll">
-              <div v-if="true"
+              <div v-show="hasLyric"
                    ref="lyricLines"
                    class="bscroll-container">
                 <p class="text"
@@ -75,6 +74,9 @@
                    v-for="(item, index) in lyric.lines"
                    :key="index">
                   {{item.txt}}</p>
+              </div>
+              <div v-show="!hasLyric">
+                <p class="text">暂无歌词</p>
               </div>
             </div>
           </div>
@@ -194,6 +196,14 @@ import { Base64 } from 'js-base64'
 import BScroll from "better-scroll";
 import Lyric from 'lyric-parser'
 export default {
+  watch: {
+    // 如果我们退出登录就清除定时器
+    $route (to, from) {
+      if (to.path == '/loginTip')      {
+        window.clearInterval(this.timeInterval)
+      }
+    }
+  },
   data () {
     return {
       // value: '0',
@@ -219,6 +229,8 @@ export default {
       // 切换播放状态
       showplay: true,
       currentRate: 0,
+      // 是否有歌词
+      hasLyric: true,
       songs: {
         al: {
           picUrl: ''
@@ -264,14 +276,12 @@ export default {
     // currentIndex () {
     //   return this.$store.state.currentIndex
     // }
-
     ...mapGetters([
       'fullScreen',
       'playlist',
       'currentIndex',
       'singer'
     ]),
-
   },
   methods: {
     // async fetchSong () {
@@ -298,13 +308,22 @@ export default {
         this.$refs.plate.style.display = 'none'
         this.$refs.lyricList.style.display = 'block'
         this.showtoggle = !this.showtoggle
-        // console.log(this.$store.state.singer);
+        // console.log(this.$store.state.playlist);
+        // console.log(this.playlist.songid);
+        this.hasLyric = true
         const res = await this.$http.get(`/lyric?id=${this.playlist.songid}`)
+        if (res.data.nolyric) return this.hasLyric = false
+        // console.log(res);
         this.lyric = new Lyric(res.data.lrc.lyric)
         // 歌词
         const lyrictime = this.lyric.lines
         const timeArr = lyrictime.map((item, index) => {
           return item.time / 10
+        })
+        let bscrollDom = this.$refs.bscroll;
+        this.bscrollDom = new BScroll(bscrollDom, {
+          click: true,
+          tap: true,
         })
         window.clearInterval(this.timeInterval)
         this.timeInterval = window.setInterval(() => {
@@ -364,6 +383,7 @@ export default {
     },
     // 点击下一首
     nextSong (id) {
+      // console.log(id);
       var that = this
       let songlist = this.$store.state.singer
       songlist.find((item, index) => {
@@ -378,6 +398,10 @@ export default {
             index++
             this.nowPlaySongid = index
             this.$store.commit('prevSong', index)
+            window.clearInterval(this.timeInterval)
+            this.$refs.plate.style.display = 'block'
+            this.$refs.lyricList.style.display = 'none'
+            this.showtoggle = !this.showtoggle
           }
         }
       })
@@ -394,6 +418,10 @@ export default {
             index--
             this.nowPlaySongid = index
             this.$store.commit('prevSong', index)
+            window.clearInterval(this.timeInterval)
+            this.$refs.plate.style.display = 'block'
+            this.$refs.lyricList.style.display = 'none'
+            this.showtoggle = !this.showtoggle
           }
 
         }
@@ -406,20 +434,18 @@ export default {
     },
     // 删除单个歌曲
     deleteSong (index) {
-      console.log(index);
+      // console.log(index);
       window.clearInterval(this.timeInterval)
       this.$store.commit('deleteSong', index)
     },
     // 删除全部播放歌曲
     deleteAllsong () {
       window.clearInterval(this.timeInterval)
-
       this.$store.commit('deleteAllSong')
     },
     // 喜欢歌曲
     loveSong (id) {
       console.log(id);
-
     },
     // 判断时长
     addNum (value) {
@@ -470,19 +496,10 @@ export default {
 
   },
   created () {
-    this.playlist = this.$store.state.playlist
-    this.id = this.$route.params.id
-    // const audio1 = document.getElementById('audio')
-    // // 开始播放
-    // audio1.play();
   },
   mounted () {
     // console.log(this.$store.state.playlist);
-    let bscrollDom = this.$refs.bscroll;
-    this.bscrollDom = new BScroll(bscrollDom, {
-      click: true,
-      tap: true,
-    })
+
   },
 }
 </script>
@@ -565,8 +582,9 @@ export default {
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 70%;
   z-index: 800;
+  /* margin-top: 100px; */
   transition: all 0.2s ease-in-out;
 }
 .plate .plate_bar {
@@ -643,14 +661,16 @@ export default {
   width: 100%;
   display: flex;
   position: absolute;
-  bottom: 10px;
+  bottom: 40px;
   justify-content: space-around;
   align-items: center;
 }
 .plate_bottom {
-  position: relative;
+  position: absolute;
   z-index: 999;
+  width: 100%;
   padding: 0 10px;
+  bottom: 30px;
 }
 .slide_flex {
   display: flex;
@@ -751,6 +771,7 @@ export default {
   z-index: 999;
   overflow: hidden;
   margin-bottom: 50px;
+  margin-top: 40px;
 }
 .lyric_wrap {
   height: 100%;
@@ -807,10 +828,17 @@ export default {
 /* 播放历史 */
 .playhispop_items {
   padding: 10px;
+  padding-top: 62px;
 }
 .playhispop_header {
   padding: 20px 10px;
   font-weight: bold;
+  background-color: #fff;
+  position: fixed;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  z-index: 99;
+  width: 100%;
 }
 .playhispop_header span {
   color: #747d8c;

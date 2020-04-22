@@ -29,8 +29,14 @@
                    tag="div"
                    v-for="(item, index) in playList"
                    :key="index">
-        <img v-lazy="item.coverImgUrl"
-             alt="">
+        <div class="square_itemimg">
+          <img v-lazy="item.coverImgUrl"
+               alt="">
+        </div>
+        <div class="square_playcount">
+          <van-icon name="service-o" />
+          {{item.playCount | filterPlayCount}}
+        </div>
         <div class="square_content">{{item.name}}</div>
       </router-link>
     </div>
@@ -43,6 +49,18 @@ import load from '../components/load.vue'
 export default {
   components: {
     load
+  },
+  filters: {
+    filterPlayCount (val) {
+      if (val > 100000000)      {
+        // console.log(val);
+        return (val / 100000000).toFixed(1) + '亿'
+      } else if (val > 10000)      {
+        return parseInt(val / 10000) + '万'
+      } else      {
+        return val
+      }
+    }
   },
   data () {
     return {
@@ -147,6 +165,7 @@ export default {
   margin-bottom: 50px;
 }
 .square_item {
+  position: relative;
   width: calc(calc(100% / 3) - 10px);
   margin: 10px 5px;
   display: flex;
@@ -155,11 +174,26 @@ export default {
   box-sizing: border-box;
   /* border: 1px solid #000; */
 }
+.square_itemimg {
+  width: 100%;
+  position: relative;
+}
+.square_itemimg::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  background-color: rgba(42, 42, 42, 0.69);
+  opacity: 0.5;
+  border-radius: 5px;
+  height: 95.8%;
+}
 .square_item img {
   width: 100%;
   height: 115px;
   object-fit: cover;
   border-radius: 5px;
+  height: 100%;
+  background-position: center;
 }
 .square_content {
   overflow: hidden;
@@ -168,5 +202,15 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   font-size: 13px;
+  margin-top: 5px;
+}
+.square_playcount {
+  position: absolute;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  right: 5px;
+  top: 5px;
+  font-size: 12px;
 }
 </style>

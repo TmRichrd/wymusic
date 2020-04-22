@@ -36,7 +36,8 @@
 
         <!-- swiper -->
         <swiper ref="list"
-                @slide-change="() => active = $refs.list.swiper.realIndex" :options="{autoHeight: true}">
+                @slide-change="() => active = $refs.list.swiper.realIndex"
+                :options="{autoHeight: true}">
           <!-- 我的 -->
           <swiper-slide>
             <personal></personal>

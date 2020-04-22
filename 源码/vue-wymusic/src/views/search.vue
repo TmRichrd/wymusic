@@ -121,7 +121,7 @@ export default {
       if (this.searchValue !== '')      {
         const res = await this.$http.get(`search?keywords=${this.searchValue}&type=1018`)
         this.searchResult = res.data.result
-        // console.log(res);
+        console.log(this.searchResult);
         this.addSearch(this.searchValue)
         sessionStorage.setItem('searchValue', this.searchValue)
         // this.$router.push({ name: 'comp', params: { searchValue: this.searchValue } })

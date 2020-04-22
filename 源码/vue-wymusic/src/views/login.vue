@@ -3,7 +3,7 @@
     <div class="login_header">
       <van-icon name="arrow-left"
                 size="25"
-                @click="$router.push('/')" />
+                @click="$router.go(-1)" />
       <span>手机号登录</span>
     </div>
     <div class="login_icon">
@@ -11,7 +11,8 @@
            alt="">
     </div>
     <div class="login_from">
-      <van-form @submit="onSubmit">
+      <van-form @submit="onSubmit"
+                autocomplete="off">
         <van-field v-model="username"
                    name="phone"
                    label="手机号"
@@ -43,26 +44,40 @@ export default {
     return {
       username: '',
       password: '',
-      pattern: /^1[3456789]\d{9}$/
+      pattern: /^1[3456789]\d{9}$/,
+      id: ''
     }
   },
   methods: {
     // 登录请求
     async onSubmit (values) {
       const res = await this.$http.get(`/login/cellphone?phone=${values.phone}&password=${values.password}`)
-      console.log(res);
       if (res.data.code == 502)      {
-        this.$toast(res.data.message);
+        return this.$toast(res.data.message);
       } else if (res.data.code == 200)      {
+        this.id = res.data.account.id
         localStorage.setItem('userInfo', JSON.stringify(res.data.profile))
+        this.fetchUserinfo(this.id)
         this.$toast('登录成功');
+        this.fetchMsg()
         setTimeout(() => {
           this.$router.push('/')
         }, 1000);
       } else      {
-       return this.$toast('账号不存在');
+        return this.$toast('账号不存在');
       }
     },
+    // 请求用户详细信息
+    async fetchUserinfo (id) {
+      const res = await this.$http.get(`/user/detail?uid=${id}`)
+      localStorage.setItem('level', JSON.stringify(res.data.level))
+    },
+    // 私信消息
+    async fetchMsg () {
+      const res = await this.$http.get('msg/private')
+      // console.log(res.data.msgs);
+      this.$store.commit('saveMsg', { count: res.data.newMsgCount, msg: res.data.msgs })
+    }
   },
 }
 </script>

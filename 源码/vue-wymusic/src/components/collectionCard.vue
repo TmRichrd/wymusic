@@ -63,7 +63,8 @@
     <!-- 歌曲列表 -->
     <div class="songlist">
       <div class="songlist_header">
-        <div class="songlist_headerleft">
+        <div class="songlist_headerleft"
+             @click="playAll">
           <van-icon name="https://s1.ax1x.com/2020/03/26/GphbSs.png"
                     size="20" />
           <h5>播放全部</h5><span>(共{{colldata.tracks.length}}首)</span>
@@ -95,9 +96,15 @@
                         :class="item.pop<90?'sprite':''"></span> -->
                 <!-- <van-tag color="#f2826a"
                            plain>{{item.fee==8?'vip':''}}</van-tag> -->
+                <!-- item.copyright==2?'sprite_vip':'' -->
+                <!-- <span class="songlist_sq"
+                      :class="item.fee==8?'sprite3':''"></span> -->
                 <span class="songlist_sq"
-                      :class="item.fee==8?'sprite3':''"></span>
-                <!-- <span>{{}}</span> -->
+                      v-if="item.fee==1"
+                      :class="{'sprite_vip':item.fee==1,}"></span>
+                <span class="songlist_sq"
+                      :class="{'sprite3':item.fee==8 ||item.fee==1}"
+                      v-if="item.fee==8||item.fee==1"></span>
                 {{item.ar.map(v=>v.name).join('/')}}
                 -{{item.al.name}}
               </div>
@@ -133,12 +140,20 @@ export default {
   },
   methods: {
     handleSong (item, index, songid, singer, songname) {
-      console.log(item);
+      // console.log(item);
+      if (item.fee == 1)      {
+        return this.$toast('vip歌曲暂时无法播放')
+      } else if (item.fee == 4)      {
+        return this.$toast('请先购买专辑')
+      }
       this.$store.commit('changeFull')
       this.$store.commit("addSong", { item: item.al, index: index, songid: songid, singer: item.ar.map(v => v.name).join('/'), songname: item.name })
       this.$store.commit('pushSong', item.al)
       this.fetchSongurl(item.id)
+      // console.log(this.$store.state.playlist);
 
+      const audio1 = document.getElementById('audio')
+      // console.log(audio1);
     },
     async  fetchSongurl (id) {
       const res = await this.$http.get(`song/url?id=${id}`)
@@ -153,6 +168,16 @@ export default {
     // 检索
     filterSong () {
       return this.colldata.tracks.filter(item => item.name.includes(this.searchValue))
+    },
+    playAll () {
+      this.colldata.tracks.map(async v => {
+        const res = await this.$http(`song/url?id=${v.id}`)
+        v.al.songname = v.name
+        v.al.songid = v.id
+        v.al.singer = v.ar.map(a => a.name).join('/')
+        v.al.url = res.data.data[0].url
+      })
+      this.$store.commit('pushAllSong', this.colldata.tracks)
     }
   },
 }
@@ -186,6 +211,9 @@ export default {
   width: auto;
   display: flex;
   align-items: center;
+}
+.collheader_right .van-icon {
+  margin-left: 20px;
 }
 .collheader_right input[type="text"] {
   border-radius: 20px;
@@ -392,5 +420,11 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.sprite_vip {
+  background: url(https://s1.ax1x.com/2020/04/11/GbXi9K.png) no-repeat 0 0;
+  background-size: 43px 554px;
+  width: 6px;
+  height: 6px;
 }
 </style>

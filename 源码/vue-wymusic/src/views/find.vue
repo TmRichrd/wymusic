@@ -55,7 +55,9 @@
                 <!-- 播放数量 -->
                 <div class="palynum">
                   <van-icon name="service-o" />
-                  {{(item.playCount/10000>1)?parseInt(item.playCount/10000)+'万':item.playCount}}</div>
+                  <!-- {{(item.playCount/10000>1)?parseInt(item.playCount/10000)+'万':item.playCount}} -->
+                  {{item.playCount|filterPlayCount}}
+                </div>
                 <div class="reco_songtitle">{{item.name}}</div>
               </router-link>
             </swiper-slide>
@@ -186,6 +188,18 @@ export default {
   watch: {
     // 监听点击的banner索引，判断当前的bannerId，然后利用当前id去请求数据
 
+  },
+  filters: {
+    filterPlayCount (val) {
+      if (val > 100000000)      {
+        console.log(val);
+        return (val / 100000000).toFixed(1) + '亿'
+      } else if (val > 10000)      {
+        return parseInt(val / 10000) + '万'
+      } else      {
+        return val
+      }
+    }
   },
   data () {
     return {

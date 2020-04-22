@@ -1,7 +1,7 @@
 <template>
-  
-    <div class="personal">
-      <transition name="fade">
+
+  <div class="personal">
+    <transition name="fade">
       <div class="personal_warp">
         <div class="personal_header"
              :style="userInfo?{'background-image':`url(${userInfo.backgroundUrl})`}:''">
@@ -18,9 +18,16 @@
           <div class="user_login"
                v-else-if="userInfo">
             <div class="userinfo_left">
-              <img :src="userInfo.avatarUrl"
-                   alt="">
-              <span>{{userInfo.nickname}}</span>
+              <div>
+                <img :src="userInfo.avatarUrl"
+                     alt="">
+              </div>
+              <div class="usernickname">
+                <div>
+                  <p>{{userInfo.nickname}}</p>
+                </div>
+                <div><button>LV.{{level}}</button></div>
+              </div>
             </div>
             <div class="userinfo_right">
               开通黑胶VIP&gt;
@@ -111,8 +118,8 @@
 
         </div>
       </div>
-      </transition>
-    </div>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -124,7 +131,7 @@ export default {
         spaceBetween: 10,
       },
       userInfo: JSON.parse(localStorage.getItem('userInfo')) || '',
-
+      level: JSON.parse(localStorage.getItem('level')) || ''
     }
   },
   computed: {
@@ -139,7 +146,7 @@ export default {
   },
   methods: {
     goLogin () {
-      this.$router.push('/login')
+      this.$router.push('/loginTip')
     }
   },
 
@@ -169,7 +176,7 @@ export default {
   height: 100%;
   left: 0;
   top: 0;
-  opacity: 0.5;
+  opacity: 0.9;
   z-index: 20;
   background-color: rgba(42, 42, 42, 0.69);
 }
@@ -342,5 +349,19 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.usernickname {
+  height: 100%;
+  margin-left: 10px;
+}
+.usernickname p {
+  margin: 0;
+}
+.usernickname button {
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  background-color: rgba(42, 42, 42, 0.69);
+  font-size: 1px;
 }
 </style>

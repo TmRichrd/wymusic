@@ -122,6 +122,7 @@ export default {
   height: 60px;
   padding: 10px;
   display: flex;
+  background-color: #fff;
   align-items: center;
 }
 .ranklist_header span {
@@ -168,7 +169,7 @@ export default {
 .ranklist_reco {
   padding: 10px;
 }
-.ranklistreco_items {
+.ranklist_reco .ranklistreco_items {
   display: flex;
   flex-wrap: wrap;
 }
@@ -180,7 +181,7 @@ export default {
 .ranklistreco_itemleft img {
   width: 100%;
   border-radius: 5px;
-  /* object-fit: cover; */
+  object-fit: cover;
 }
 .ranklistreco_itemleft {
   position: relative;

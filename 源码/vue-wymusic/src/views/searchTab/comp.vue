@@ -21,7 +21,7 @@
                      v-if="item.officialTags.length!==0">
               {{item.officialTags.join('/')}}</van-tag>
           </div>
-          <div class="cmp_itemcontent"><span :class="item.fee==8?'sprite':''"></span>{{item.ar.map(v=>v.name).join('/')}} &nbsp;- &nbsp;{{item.al.name}}</div>
+          <div class="cmp_itemcontent"><span :class="item.copyright==0 ||item.fee==8?'sprite':''"></span>{{item.ar.map(v=>v.name).join('/')}} &nbsp;- &nbsp;{{item.al.name}}</div>
         </div>
         <div class="comp_itemright"></div>
       </div>
@@ -98,7 +98,10 @@
           <div class="mlog_img">
             <img :src="item.resource.mlogBaseData.coverUrl"
                  alt="">
-            <div class="matchFieldContent">{{item.matchFieldContent}}</div>
+            <div class="matchFieldContent"
+                 v-if="item.matchFieldContent">{{item.matchFieldContent}}</div>
+            <div class="matchFieldContent"
+                 v-if="item.resource.mlogBaseData.talk!==null && item.matchFieldContent==null"># {{item.resource.mlogBaseData.talk.talkName}}</div>
           </div>
           <div class="mlog_content">
             <div class="mlog_text">
@@ -197,11 +200,16 @@ export default {
   },
   methods: {
     handleSong (item, index, songid, singer, songname) {
-      // console.log(item);
-      this.fetchSongurl(item.id)
-      this.$store.commit("addSong", { item: item.al, index: index, songid: songid, singer: item.ar.map(v => v.name).join('/'), songname: item.name })
-      this.$store.commit('pushSong', item.al)
-      this.$store.commit('changeFull')
+      console.log(item);
+      if (item.fee == 1)      {
+        return this.$toast('vip歌曲暂时无法播放')
+      } else      {
+        this.fetchSongurl(item.id)
+        this.$store.commit("addSong", { item: item.al, index: index, songid: songid, singer: item.ar.map(v => v.name).join('/'), songname: item.name })
+        this.$store.commit('pushSong', item.al)
+        this.$store.commit('changeFull')
+      }
+
     },
     async  fetchSongurl (id) {
       const res = await this.$http.get(`song/url?id=${id}`)
